@@ -28,11 +28,8 @@ const UserPage = ({ userData, photosData }) => {
   };
 
   const photoVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 0.5, staggerChildren: 0.2 },
-    },
+    hidden: { opacity: 0, x: -100 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.2 } },
   };
 
   const thumbnailVariants = {
@@ -113,12 +110,14 @@ const UserPage = ({ userData, photosData }) => {
                     className="rounded-md overflow-hidden"
                     variants={thumbnailVariants}
                   >
-                    <Image
-                      src={photo.thumbnailUrl}
-                      alt={`Photo ${photo.id}`}
-                      width={200}
-                      height={200}
-                    />
+                    <motion.div variants={photoVariants}>
+                      <Image
+                        src={photo.thumbnailUrl}
+                        alt={`Photo ${photo.id}`}
+                        width={200}
+                        height={200}
+                      />
+                    </motion.div>
                   </motion.div>
                 ))}
               </div>
