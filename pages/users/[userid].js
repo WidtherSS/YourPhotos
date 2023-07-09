@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import Typical from "react-typical";
 import fetch from "isomorphic-unfetch";
 import Link from "next/link";
@@ -8,18 +8,34 @@ import Header from "../../components/Header";
 
 const UserPage = ({ userData, photosData }) => {
   const [isFollowing, setIsFollowing] = useState(false);
+  const controls = useAnimation();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     console.log("Follow state changed:", isFollowing);
   }, [isFollowing]);
 
+  useEffect(() => {
+    if (imageLoaded) {
+      controls.start({ x: 0, opacity: 1 });
+    }
+  }, [imageLoaded]);
+
   const handleFollowClick = () => {
     setIsFollowing((prevIsFollowing) => !prevIsFollowing);
   };
 
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+
   const userVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.5 } },
+    hidden: { x: -100, opacity: 0 },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: { duration: 0.5, delay: 0.2 },
+    },
   };
 
   const buttonVariants = {
@@ -28,8 +44,11 @@ const UserPage = ({ userData, photosData }) => {
   };
 
   const photoVariants = {
-    hidden: { opacity: 0, x: -100 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.2 } },
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.5, staggerChildren: 0.2 },
+    },
   };
 
   const thumbnailVariants = {
@@ -46,7 +65,7 @@ const UserPage = ({ userData, photosData }) => {
             <motion.div
               className="text-center pb-4 sm:pb-7"
               initial="hidden"
-              animate="visible"
+              animate={controls}
               variants={userVariants}
             >
               <h1 className="text-3xl sm:text-5xl font-semibold">
@@ -65,7 +84,7 @@ const UserPage = ({ userData, photosData }) => {
           <motion.div
             className="w-32 h-32 sm:w-48 sm:h-48 relative rounded-full overflow-hidden"
             initial="hidden"
-            animate="visible"
+            animate={controls}
             variants={userVariants}
           >
             <Image
@@ -73,13 +92,14 @@ const UserPage = ({ userData, photosData }) => {
               alt={`Avatar of ${userData.name}`}
               layout="fill"
               objectFit="cover"
+              onLoad={handleImageLoad}
             />
           </motion.div>
 
           <motion.div
             className="pt-5"
             initial="hidden"
-            animate="visible"
+            animate={controls}
             variants={userVariants}
           >
             <motion.button
